@@ -159,8 +159,9 @@ select {
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-2);
+  border: 1px solid transparent;
   border-radius: calc(var(--radius) - 2px);
-  transition: all var(--transition);
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
 }
 
 .header-tab:hover {
@@ -170,7 +171,7 @@ select {
 .header-tab.active {
   background: var(--bg-1);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border-color: var(--border);
 }
 
 .main-content {
@@ -224,12 +225,11 @@ select {
   border-radius: var(--radius);
   background: var(--bg-1);
   overflow: hidden;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition: border-color var(--transition);
 }
 
 .base-row:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-dim);
 }
 
 .base-row.active {
@@ -239,7 +239,6 @@ select {
 
 .base-row.error {
   border-color: var(--red);
-  box-shadow: 0 0 0 2px var(--red-dim);
 }
 
 .base-label {
