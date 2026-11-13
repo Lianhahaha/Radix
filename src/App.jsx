@@ -101,6 +101,7 @@ export default function App() {
   const [activeBase, setActiveBase] = useState(10);
   const [customBase, setCustomBase] = useState('3');
   const [error, setError]     = useState('');
+  const [errorBase, setErrorBase] = useState(null);
   const [bitWidth, setBitWidth] = useState(8);
   const [history, setHistory]  = useState(loadHistory);
   const [mobileTab, setMobileTab] = useState('convert');
@@ -142,6 +143,7 @@ export default function App() {
       clearTimeout(historyTimer.current);
       setValues({ 2: '', 8: '', 10: '', 16: '', custom: '' });
       setError('');
+      setErrorBase(null);
       setHasUserTyped(false);
       return;
     }
@@ -163,6 +165,7 @@ export default function App() {
     const activeObj = currentExtendedBases.find(b => b.id === fromId);
     if (!activeObj || !activeObj.base) {
       setError(fromId === 'custom' ? 'Custom base must be between 2 and 36' : 'Invalid base');
+      setErrorBase(fromId);
       setValues(newValues);
       return;
     }
@@ -181,6 +184,7 @@ export default function App() {
 
     setValues(newValues);
     setError(firstError);
+    setErrorBase(firstError ? fromId : null);
 
     if (!firstError) {
       const entry = {
@@ -223,6 +227,7 @@ export default function App() {
       setCustomBase(String(item.customBase ?? item.fromBase ?? '3'));
     }
     setError('');
+    setErrorBase(null);
     setHasUserTyped(true);
     if (isMobile) setMobileTab('convert');
   };
@@ -261,7 +266,7 @@ export default function App() {
                 value={values[id]}
                 onChange={val => handleInput(id, val)}
                 isActive={isActive}
-                error={!!error && isActive}
+                error={!!error && errorBase === id}
                 isCustom={isCustom}
                 customBaseStr={customBase}
                 onCustomBaseChange={handleCustomBaseChange}
@@ -344,8 +349,8 @@ export default function App() {
           <button
             className="icon-btn"
             onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            title="Toggle theme"
-            aria-label="Toggle theme"
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>

@@ -12,7 +12,7 @@ export default function StepPanel({ input, fromBase, toBase, label }) {
 
   const [intPart, fracPart] = (input || '').split('.');
   const steps = getSteps(intPart || '', fromBase, toBase);
-  const fracSteps = fracPart ? getFractionalSteps(fracPart, fromBase, toBase) : [];
+  const fracSteps = fracPart ? getFractionalSteps(fracPart, fromBase, toBase, 10) : [];
   const allSteps = [...steps, ...fracSteps];
 
   const hasSteps = allSteps.length > 0 && fromBase !== toBase;

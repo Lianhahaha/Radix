@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function LearnPanel() {
   return (
     <div className="learn-panel fade-in">
