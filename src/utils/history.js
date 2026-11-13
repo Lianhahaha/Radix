@@ -27,6 +27,11 @@ export function parseHistory(raw, limit = 10) {
 /** Insert an entry, replacing any previous conversion with the same input/base. */
 export function addHistoryEntry(list, entry, limit = 10) {
   const id = entryBaseId(entry);
-  const deduped = list.filter(item => !(item.input === entry.input && entryBaseId(item) === id));
+  const deduped = list.filter((item) => {
+    if (item.input !== entry.input) return true;
+    if (entryBaseId(item) !== id) return true;
+    if (id === 'custom') return String(item.customBase) !== String(entry.customBase);
+    return false;
+  });
   return [entry, ...deduped].slice(0, limit);
 }

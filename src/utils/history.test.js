@@ -63,6 +63,13 @@ describe('addHistoryEntry', () => {
     expect(next).toHaveLength(2);
   });
 
+  it('separates the same digits in different custom bases', () => {
+    const list = [entry({ input: '10', fromId: 'custom', fromBase: 3, customBase: '3' })];
+    const next = addHistoryEntry(list, entry({ input: '10', fromId: 'custom', fromBase: 5, customBase: '5' }));
+    expect(next).toHaveLength(2);
+    expect(addHistoryEntry(next, entry({ input: '10', fromId: 'custom', fromBase: 5, customBase: '5' }))).toHaveLength(2);
+  });
+
   it('caps the list', () => {
     let list = [];
     for (let i = 0; i < 20; i++) list = addHistoryEntry(list, entry({ input: String(i) }), 10);

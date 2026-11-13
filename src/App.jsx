@@ -217,16 +217,24 @@ export default function App() {
 
   const handleHistorySelect = (item) => {
     setValues(item.results);
-    setActiveBase(entryBaseId(item));
-    if (entryBaseId(item) === 'custom' && item.customBase) setCustomBase(String(item.customBase));
+    const id = entryBaseId(item);
+    setActiveBase(id);
+    if (id === 'custom') {
+      setCustomBase(String(item.customBase ?? item.fromBase ?? '3'));
+    }
     setError('');
     setHasUserTyped(true);
     if (isMobile) setMobileTab('convert');
   };
 
   const clearHistory = () => {
+    clearTimeout(historyTimer.current);
     setHistory([]);
-    localStorage.removeItem(HISTORY_KEY);
+    try {
+      localStorage.removeItem(HISTORY_KEY);
+    } catch {
+      /* ignore quota / private-mode failures */
+    }
   };
 
   // ── Sub-panels ─────────────────────────────────────────────────
