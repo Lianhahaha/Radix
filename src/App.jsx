@@ -113,6 +113,8 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#000000' : '#f8f9fa');
     try {
       localStorage.setItem(THEME_KEY, theme);
     } catch {
@@ -237,7 +239,7 @@ export default function App() {
         </span>
       </div>
 
-      {error && <div className="error-msg">{error}</div>}
+      {error && <div className="error-msg" role="alert">{error}</div>}
 
       <div className="base-inputs">
         {extendedBases.map(({ id, base, name, isCustom }) => {
@@ -271,6 +273,12 @@ export default function App() {
         })}
       </div>
 
+      {!hasUserTyped && (
+        <p className="hint">
+          Type in any row to convert instantly — the other bases update as you go.
+        </p>
+      )}
+
       <BitWidthSelector
         decimalValue={values[10]}
         width={bitWidth}
@@ -298,6 +306,7 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────────
   return (
     <div className="app">
+      <a className="skip-link" href="#main">Skip to content</a>
       <header className="header">
         <div className="header-left">
           <span className="header-logo">radix<span>.</span>convert</span>
@@ -338,7 +347,7 @@ export default function App() {
       {isMobile ? (
         /* ── Mobile: single-column tab-switched ────────────────── */
         <>
-          <main className="mobile-main">
+          <main className="mobile-main" id="main">
             {mobileTab === 'convert' && (
               <section className="mobile-pane fade-in">
                 {ConverterContent}
@@ -383,7 +392,7 @@ export default function App() {
       ) : (
         /* ── Desktop: two-column sidebar layout ─────────────────── */
         mainTab === 'app' ? (
-          <main className="main-content fade-in">
+          <main className="main-content fade-in" id="main">
             <section className="left-pane">
               {ConverterContent}
             </section>
@@ -394,7 +403,7 @@ export default function App() {
             </aside>
           </main>
         ) : (
-          <main className="main-content fade-in" style={{ display: 'block' }}>
+          <main className="main-content fade-in" id="main" style={{ display: 'block' }}>
             <LearnPanel />
           </main>
         )
