@@ -1,112 +1,86 @@
-import { useEffect } from 'react';
-
-const OPERATIONS = ['AND', 'OR', 'XOR', 'NOT', 'SHL', 'SHR'];
+import { useMemo, useEffect } from 'react';
+import { OPERATIONS, computeBitwise } from '../utils/bitwise';
 
 export default function BitwiseCalc({ op, setOp, a, setA, b, setB, bits, setBits, onResult }) {
-
-  const calculate = () => {
-    const numA = parseInt(a, 10);
-    const numB = parseInt(b, 10);
-    
-    // For NOT, only A is used
-    if (isNaN(numA) && a !== '') return null;
-    if (op !== 'NOT' && isNaN(numB) && b !== '') return null;
-    if (a === '' || (b === '' && op !== 'NOT')) return null;
-
-    let res = 0;
-    const mask = bits === 32 ? 0xFFFFFFFF : (1 << bits) - 1;
-
-    switch (op) {
-      case 'AND': res = numA & numB; break;
-      case 'OR':  res = numA | numB; break;
-      case 'XOR': res = numA ^ numB; break;
-      case 'NOT': res = ~numA; break;
-      case 'SHL': res = numA << numB; break;
-      case 'SHR': res = numA >> numB; break;
-      default: return null;
-    }
-
-    // Apply bit mask to simulate fixed width (e.g., 8-bit, 16-bit)
-    // In JS bitwise ops are 32-bit signed. 
-    // We mask to unsigned N-bits to display properly.
-    const unsignedRes = (res >>> 0) & mask;
-    
-    return {
-      decimal: unsignedRes,
-      binary: unsignedRes.toString(2).padStart(bits, '0')
-    };
-  };
-
-  const result = calculate();
+  const { result, error } = useMemo(
+    () => computeBitwise({ op, a, b, bits }),
+    [op, a, b, bits],
+  );
 
   useEffect(() => {
-    if (onResult) {
-      onResult(result);
-    }
-  }, [result?.binary, result?.decimal]); // Only trigger when result values change to prevent infinite loops
+    if (onResult) onResult(result);
+  }, [result, onResult]);
+
+  const needsB = op !== 'NOT';
+  const isShift = op === 'SHL' || op === 'SHR';
 
   return (
-    <div className="bitwise-section" style={{ marginTop: '24px' }}>
+    <div className="bitwise-section">
       <div className="section-label">Bitwise Calculator ({bits}-bit)</div>
-      
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+
+      <div className="bitwise-inputs">
         <input
           className="custom-base-input"
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="A (dec)"
+          aria-label="Operand A in decimal"
           value={a}
           onChange={e => setA(e.target.value)}
-          style={{ flex: 1 }}
         />
-        
-        <select 
-          className="custom-base-input" 
-          value={op} 
+
+        <select
+          className="custom-base-input bitwise-op"
+          value={op}
           onChange={e => setOp(e.target.value)}
-          style={{ width: 'auto', flex: 0 }}
+          aria-label="Bitwise operation"
         >
           {OPERATIONS.map(o => <option key={o} value={o}>{o}</option>)}
         </select>
 
-        {op !== 'NOT' && (
+        {needsB && (
           <input
             className="custom-base-input"
-            type="number"
-            placeholder={op.startsWith('SH') ? "Shift by..." : "B (dec)"}
+            type="text"
+            inputMode="numeric"
+            placeholder={isShift ? 'Shift by…' : 'B (dec)'}
+            aria-label={isShift ? 'Shift amount' : 'Operand B in decimal'}
             value={b}
             onChange={e => setB(e.target.value)}
-            style={{ flex: 1 }}
           />
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+      <div className="bitwise-widths">
         {[8, 16, 32].map(w => (
           <button
             key={w}
             className={`bit-btn ${bits === w ? 'active' : ''}`}
             onClick={() => setBits(w)}
-            style={{ flex: 1 }}
+            aria-pressed={bits === w}
           >
             {w}-bit
           </button>
         ))}
       </div>
 
+      {error && <div className="field-error">{error}</div>}
+
       {result && (
         <div className="binary-viewer fade-in">
           <div className="binary-viewer-row">
             <span className="binary-viewer-label">Result (dec)</span>
-            <span className="binary-viewer-value" style={{ color: 'var(--text)' }}>
-              {result.decimal}
-            </span>
+            <span className="binary-viewer-value num">{result.decimal}</span>
           </div>
           <div className="binary-viewer-row">
             <span className="binary-viewer-label">Result (bin)</span>
-            <span className="binary-viewer-value" style={{ color: 'var(--accent-hi)' }}>
+            <span className="binary-viewer-value num accent">
               {result.binary.replace(/(.{4})/g, '$1 ').trim()}
             </span>
           </div>
+          {result.wrapped && (
+            <div className="viewer-note">Input wrapped to the {bits}-bit range.</div>
+          )}
         </div>
       )}
     </div>

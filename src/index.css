@@ -398,6 +398,39 @@ select {
   border-radius: 4px;
 }
 
+/* ── Bitwise calculator ──────────────────────────────────────────── */
+.bitwise-inputs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bitwise-inputs .custom-base-input { flex: 1; min-width: 0; }
+.bitwise-op { flex: 0 0 auto; }
+
+.bitwise-widths {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bitwise-widths .bit-btn { flex: 1; }
+
+.field-error {
+  font-size: 0.75rem;
+  color: var(--red);
+  margin: 4px 0 10px;
+}
+
+.viewer-note {
+  font-size: 0.68rem;
+  color: var(--text-3);
+  margin-top: 8px;
+}
+
+.binary-viewer-value.num { font-variant-numeric: tabular-nums; }
+.binary-viewer-value.accent { color: var(--accent-hi); }
+
 /* ── Custom Base ─────────────────────────────────────────────────── */
 .custom-base-section {
   margin-bottom: 24px;
