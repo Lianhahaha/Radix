@@ -1,82 +1,104 @@
-import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 
-export default function StringCodec({ text, setText, hex, setHex, binary, setBinary }) {
+const HEX_INPUT_RE = /^[0-9a-fA-F\s]*$/;
 
-  // When text changes, update hex and binary
-  const handleTextChange = (e) => {
-    const val = e.target.value;
-    setText(val);
-    
+export default function StringCodec({
+  text, setText,
+  hex, setHex,
+  binary, setBinary,
+  hexError, setHexError,
+}) {
+  const handleTextChange = useCallback((event) => {
+    const value = event.target.value;
+    setText(value);
+    setHexError('');
+
     try {
-      const utf8 = new TextEncoder().encode(val);
-      const hexStr = Array.from(utf8).map(b => b.toString(16).padStart(2, '0')).join(' ');
-      const binStr = Array.from(utf8).map(b => b.toString(2).padStart(8, '0')).join(' ');
-      setHex(hexStr);
-      setBinary(binStr);
+      const utf8 = new TextEncoder().encode(value);
+      setHex(Array.from(utf8, byte => byte.toString(16).padStart(2, '0')).join(' '));
+      setBinary(Array.from(utf8, byte => byte.toString(2).padStart(8, '0')).join(' '));
     } catch {
-      setHex('Error encoding text');
+      setHex('');
       setBinary('');
+      setHexError('Unable to encode this text as UTF-8');
     }
-  };
+  }, [setText, setHex, setBinary, setHexError]);
 
-  // When hex changes, update text and binary
-  const handleHexChange = (e) => {
-    let val = e.target.value;
-    setHex(val);
+  const handleHexChange = useCallback((event) => {
+    const value = event.target.value;
+    setHex(value);
 
-    const clean = val.replace(/[^0-9a-fA-F]/g, '');
-    if (clean.length % 2 !== 0) {
-      setText('...');
-      setBinary('...');
+    if (!HEX_INPUT_RE.test(value)) {
+      setHexError('Hexadecimal accepts 0–9 and A–F only');
       return;
     }
 
-    try {
-      const bytes = new Uint8Array(clean.length / 2);
-      for (let i = 0; i < bytes.length; i++) {
-        bytes[i] = parseInt(clean.substr(i * 2, 2), 16);
-      }
-      setText(new TextDecoder('utf-8').decode(bytes));
-      setBinary(Array.from(bytes).map(b => b.toString(2).padStart(8, '0')).join(' '));
-    } catch {
-      setText('Invalid Hex sequence');
-      setBinary('');
+    const clean = value.replace(/\s/g, '');
+    if (clean.length % 2 !== 0) {
+      setHexError('Hexadecimal needs an even number of digits (two per byte)');
+      return;
     }
-  };
+
+    setHexError('');
+    const bytes = new Uint8Array(clean.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+    }
+
+    try {
+      // fatal: reject malformed UTF-8 instead of showing replacement characters.
+      setText(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+      setBinary(Array.from(bytes, byte => byte.toString(2).padStart(8, '0')).join(' '));
+    } catch {
+      setText('');
+      setBinary('');
+      setHexError('These bytes are not valid UTF-8');
+    }
+  }, [setHex, setText, setBinary, setHexError]);
 
   return (
-    <div className="string-codec-section" style={{ marginTop: '24px' }}>
+    <div className="string-codec-section">
       <div className="section-label">String / Text Encoder (UTF-8)</div>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <textarea
-          className="custom-base-input"
-          placeholder="Enter text string..."
-          value={text}
-          onChange={handleTextChange}
-          rows={2}
-          style={{ resize: 'vertical' }}
-        />
-        
-        <textarea
-          className="custom-base-input"
-          placeholder="Hexadecimal (e.g. 48 65 6c 6c 6f)"
-          value={hex}
-          onChange={handleHexChange}
-          rows={2}
-          style={{ resize: 'vertical', fontFamily: 'var(--mono)', fontSize: '0.8rem', color: 'var(--amber)' }}
-        />
-        
-        <textarea
-          className="custom-base-input"
-          placeholder="Binary"
-          value={binary}
-          readOnly
-          rows={2}
-          style={{ resize: 'vertical', fontFamily: 'var(--mono)', fontSize: '0.8rem', color: 'var(--green)' }}
-        />
+
+      <div className="codec-fields">
+        <label className="codec-field">
+          <span className="codec-label">Text</span>
+          <textarea
+            className="custom-base-input"
+            placeholder="Enter text string…"
+            value={text}
+            onChange={handleTextChange}
+            rows={2}
+          />
+        </label>
+
+        <label className="codec-field">
+          <span className="codec-label">Hexadecimal</span>
+          <textarea
+            className="custom-base-input codec-hex"
+            placeholder="48 65 6c 6c 6f"
+            value={hex}
+            onChange={handleHexChange}
+            rows={2}
+            spellCheck={false}
+            aria-invalid={!!hexError}
+          />
+        </label>
+
+        <label className="codec-field">
+          <span className="codec-label">Binary</span>
+          <textarea
+            className="custom-base-input codec-bin"
+            placeholder="01001000 01100101 01101100 01101100 01101111"
+            value={binary}
+            readOnly
+            rows={2}
+            spellCheck={false}
+          />
+        </label>
       </div>
 
+      {hexError && <div className="field-error">{hexError}</div>}
     </div>
   );
 }

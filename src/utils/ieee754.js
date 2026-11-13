@@ -12,9 +12,6 @@ export function getIeee754(decimalString) {
   const bin32 = int32.toString(2).padStart(32, '0');
   
   // Double precision (64-bit)
-  const float64 = new Float64Array([num]);
-  const int32Array = new Uint32Array(float64.buffer);
-  
   // DataView ensures correct endianness reading
   const dataView = new DataView(new ArrayBuffer(8));
   dataView.setFloat64(0, num, false); // false = Big-endian

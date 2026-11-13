@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { charToCode, codeToChar, isValidAsciiChar } from '../utils/ascii';
+import { charToCode, codeToChar } from '../utils/ascii';
 
 export default function AsciiLookup() {
   const [charInput, setCharInput] = useState('');
   const [codeInput, setCodeInput] = useState('');
 
-  const fromChar = charInput ? charToCode(charInput[0]) : null;
+  const [firstChar] = Array.from(charInput);
+  const fromChar = firstChar ? charToCode(firstChar) : null;
   const fromCode = codeInput ? codeToChar(codeInput) : null;
 
   const info = fromChar || (fromCode ? charToCode(fromCode) : null);
@@ -16,40 +17,36 @@ export default function AsciiLookup() {
 
       <div className="ascii-row">
         <input
-          className="custom-base-input"
-          style={{ width: 56, textAlign: 'center', fontSize: '1.1rem' }}
+          className="custom-base-input ascii-char-input"
           type="text"
-          maxLength={1}
           placeholder="A"
+          aria-label="Character to look up"
           value={charInput}
           onChange={e => {
             setCharInput(e.target.value);
             setCodeInput('');
           }}
-          title="Enter a character"
         />
 
         <input
           className="custom-base-input"
-          type="number"
-          min={32}
-          max={126}
+          type="text"
+          inputMode="numeric"
           placeholder="Decimal code (32–126)"
+          aria-label="ASCII decimal code to look up"
           value={codeInput}
           onChange={e => {
-            setCodeInput(e.target.value);
+            setCodeInput(e.target.value.replace(/\D/g, '').slice(0, 3));
             setCharInput('');
           }}
-          title="Enter ASCII decimal code"
-          style={{ flex: 1 }}
         />
       </div>
 
       {info ? (
         <div className="binary-viewer fade-in">
-          <div className="ascii-row" style={{ marginBottom: 8 }}>
+          <div className="ascii-row ascii-result-row">
             <div className="ascii-char-box">{info.char}</div>
-            <div style={{ flex: 1 }}>
+            <div className="ascii-result-table">
               <table className="ascii-table">
                 <tbody>
                   <tr><td>Decimal</td><td>{info.decimal}</td></tr>
@@ -62,8 +59,10 @@ export default function AsciiLookup() {
           </div>
         </div>
       ) : (charInput || codeInput) ? (
-        <div className="error-msg">
-          {charInput ? `'${charInput}' is not a printable ASCII character.` : 'Code must be between 32 and 126.'}
+        <div className="field-error">
+          {charInput
+            ? `'${charInput}' is not a printable ASCII character.`
+            : 'Code must be between 32 and 126.'}
         </div>
       ) : null}
     </div>

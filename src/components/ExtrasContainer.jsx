@@ -1,165 +1,146 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import StringCodec from './StringCodec';
 import BitwiseCalc from './BitwiseCalc';
+import AsciiLookup from './AsciiLookup';
+import { formatBinary } from '../utils/convert';
+
+const PROOF_BYTE_LIMIT = 5;
+
+function StringProof({ bytes }) {
+  const [tab, setTab] = useState('hex');
+
+  return (
+    <section className="proof fade-in" aria-live="polite">
+      <div className="section-label">Here&apos;s why — UTF-8 encoding</div>
+
+      <div className="proof-tabs" role="tablist" aria-label="Encoding view">
+        <button
+          className={`proof-tab ${tab === 'hex' ? 'active' : ''}`}
+          onClick={() => setTab('hex')}
+          role="tab"
+          aria-selected={tab === 'hex'}
+        >
+          to Hexadecimal
+        </button>
+        <button
+          className={`proof-tab ${tab === 'bin' ? 'active' : ''}`}
+          onClick={() => setTab('bin')}
+          role="tab"
+          aria-selected={tab === 'bin'}
+        >
+          to Binary
+        </button>
+      </div>
+
+      <div className="proof-body">
+        {bytes.slice(0, PROOF_BYTE_LIMIT).map((byte, i) => (
+          <div key={i} className="proof-row">
+            <div className="proof-title">
+              Byte {i + 1} — {byte} decimal
+            </div>
+            <div className="step-math-line">Decimal: {byte}</div>
+            {tab === 'hex' && (
+              <div className="step-math-line proof-amber">
+                Hexadecimal: {byte.toString(16).padStart(2, '0').toUpperCase()}
+              </div>
+            )}
+            {tab === 'bin' && (
+              <div className="step-math-line proof-green">
+                Binary: {byte.toString(2).padStart(8, '0')}
+              </div>
+            )}
+          </div>
+        ))}
+        {bytes.length > PROOF_BYTE_LIMIT && (
+          <div className="proof-more">…and {bytes.length - PROOF_BYTE_LIMIT} more bytes</div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function BitwiseProof({ op, a, b, result }) {
+  return (
+    <section className="proof fade-in" aria-live="polite">
+      <div className="section-label">Here&apos;s why — bitwise {op}</div>
+
+      <div className="proof-body">
+        <div className="proof-line">
+          <span className="proof-muted">A ({a})</span>
+          <span className="proof-value num">{formatBinary(result.aBinary)}</span>
+        </div>
+        {op !== 'NOT' && (
+          <div className="proof-line">
+            <span className="proof-muted">
+              {op.startsWith('SH') ? `Shift by ${b}` : `B (${b})`}
+            </span>
+            <span className="proof-value num">
+              {op.startsWith('SH') ? b : formatBinary(result.bBinary)}
+            </span>
+          </div>
+        )}
+        <div className="proof-line proof-result">
+          <span>Result</span>
+          <span className="proof-value num">{formatBinary(result.binary)}</span>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function ExtrasContainer() {
-  const [activeTool, setActiveTool] = useState(null); // 'string' or 'bitwise'
-  
-  // String State
+  // String state
   const [text, setText] = useState('');
   const [hex, setHex] = useState('');
   const [binary, setBinary] = useState('');
-  
-  // Bitwise State
+  const [hexError, setHexError] = useState('');
+  const [activeTool, setActiveTool] = useState(null);
+
+  // Bitwise state
   const [op, setOp] = useState('AND');
   const [a, setA] = useState('');
   const [b, setB] = useState('');
   const [bits, setBits] = useState(8);
   const [bitwiseResult, setBitwiseResult] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('hex'); // 'hex' or 'bin' for string
+  // The proof must describe the UTF-8 bytes that were actually encoded —
+  // not UTF-16 code units, which differ for anything outside ASCII.
+  const bytes = useMemo(() => Array.from(new TextEncoder().encode(text)), [text]);
+  const showStringProof = activeTool === 'string' && bytes.length > 0 && !hexError;
+  const showBitwiseProof = activeTool === 'bitwise' && !!bitwiseResult;
 
   return (
     <>
-      <StringCodec 
-        text={text} setText={(val) => { setText(val); setActiveTool('string'); }}
-        hex={hex} setHex={(val) => { setHex(val); setActiveTool('string'); }}
-        binary={binary} setBinary={setBinary}
+      <StringCodec
+        text={text}
+        setText={(value) => { setText(value); setActiveTool('string'); }}
+        hex={hex}
+        setHex={(value) => { setHex(value); setActiveTool('string'); }}
+        binary={binary}
+        setBinary={setBinary}
+        hexError={hexError}
+        setHexError={setHexError}
       />
-      <hr className="divider" style={{ margin: '20px 0' }} />
-      <BitwiseCalc 
-        op={op} setOp={(val) => { setOp(val); setActiveTool('bitwise'); }}
-        a={a} setA={(val) => { setA(val); setActiveTool('bitwise'); }}
-        b={b} setB={(val) => { setB(val); setActiveTool('bitwise'); }}
-        bits={bits} setBits={(val) => { setBits(val); setActiveTool('bitwise'); }}
+      {showStringProof && <StringProof bytes={bytes} />}
+
+      <hr className="divider" />
+
+      <BitwiseCalc
+        op={op}
+        setOp={(value) => { setOp(value); setActiveTool('bitwise'); }}
+        a={a}
+        setA={(value) => { setA(value); setActiveTool('bitwise'); }}
+        b={b}
+        setB={(value) => { setB(value); setActiveTool('bitwise'); }}
+        bits={bits}
+        setBits={(value) => { setBits(value); setActiveTool('bitwise'); }}
         onResult={setBitwiseResult}
       />
+      {showBitwiseProof && <BitwiseProof op={op} a={a} b={b} result={bitwiseResult} />}
 
-      {/* The unified 'Here's why' for the Extras tab */}
-      {activeTool === 'string' && text && !hex.includes('Error') && (
-        <div style={{ marginTop: '24px' }} className="fade-in">
-          <div className="section-label">Here's why (Mathematical Proof)</div>
-          
-          <div style={{ 
-            display: 'flex', 
-            marginBottom: '16px', 
-            borderBottom: '1px solid var(--border)', 
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}>
-            <button 
-              className={`tab-btn ${activeTab === 'hex' ? 'active' : ''}`}
-              onClick={() => setActiveTab('hex')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: activeTab === 'hex' ? 'var(--text)' : 'var(--text-3)',
-                padding: '8px 16px',
-                fontFamily: 'var(--mono)',
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'hex' ? '2px solid var(--accent)' : '2px solid transparent',
-                transition: 'all 0.2s',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              to Hexadecimal
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'bin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('bin')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: activeTab === 'bin' ? 'var(--text)' : 'var(--text-3)',
-                padding: '8px 16px',
-                fontFamily: 'var(--mono)',
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'bin' ? '2px solid var(--accent)' : '2px solid transparent',
-                transition: 'all 0.2s',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              to Binary
-            </button>
-          </div>
+      <hr className="divider" />
 
-          <div className="step-panel" style={{ margin: 0 }}>
-            <div className="step-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {Array.from(text).slice(0, 5).map((char, i) => {
-                const code = char.charCodeAt(0);
-                return (
-                  <div key={i} style={{ paddingBottom: '8px', borderBottom: i < Math.min(text.length, 5) - 1 ? '1px solid var(--border)' : 'none' }}>
-                    <div className="step-heading">Step {i + 1} — Encode '{char}'</div>
-                    <div className="step-math-line">Decimal (ASCII): {code}</div>
-                    {activeTab === 'hex' && (
-                      <div className="step-math-line" style={{ color: 'var(--amber)' }}>Hexadecimal: {code.toString(16).padStart(2, '0')}</div>
-                    )}
-                    {activeTab === 'bin' && (
-                      <div className="step-math-line" style={{ color: 'var(--green)' }}>Binary: {code.toString(2).padStart(8, '0')}</div>
-                    )}
-                  </div>
-                );
-              })}
-              {text.length > 5 && (
-                <div className="step-result" style={{ color: 'var(--text-3)' }}>...and {text.length - 5} more characters</div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTool === 'bitwise' && bitwiseResult && (
-        <div style={{ marginTop: '24px' }} className="fade-in">
-          <div className="section-label">Here's why (Mathematical Proof)</div>
-          
-          {/* Tab for consistency, even if there's only one operation */}
-          <div style={{ 
-            display: 'flex', 
-            marginBottom: '16px', 
-            borderBottom: '1px solid var(--border)', 
-          }}>
-            <button 
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text)',
-                padding: '8px 16px',
-                fontFamily: 'var(--mono)',
-                fontSize: '0.85rem',
-                cursor: 'default',
-                borderBottom: '2px solid var(--accent)',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Bitwise {op}
-            </button>
-          </div>
-
-          <div className="step-panel" style={{ margin: 0 }}>
-            <div className="step-body" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'var(--mono)', fontSize: '0.85rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-3)' }}>A ({a})</span>
-                <span style={{ letterSpacing: '2px' }}>{(parseInt(a, 10) >>> 0).toString(2).padStart(bits, '0').slice(-bits)}</span>
-              </div>
-              {op !== 'NOT' && (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-3)' }}>{op.startsWith('SH') ? `Shift by ${b}` : `B (${b})`}</span>
-                  <span style={{ letterSpacing: '2px' }}>
-                    {op.startsWith('SH') ? b : (parseInt(b, 10) >>> 0).toString(2).padStart(bits, '0').slice(-bits)}
-                  </span>
-                </div>
-              )}
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', color: 'var(--green)' }}>
-                <span>Result</span>
-                <span style={{ letterSpacing: '2px' }}>{bitwiseResult.binary}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AsciiLookup />
     </>
   );
 }
