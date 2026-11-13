@@ -1,7 +1,8 @@
 /** Printable ASCII range: 32–126 */
 export function charToCode(char) {
+  if (typeof char !== 'string' || char.length !== 1) return null;
   const code = char.charCodeAt(0);
-  if (code < 32 || code > 126) return null;
+  if (!Number.isInteger(code) || code < 32 || code > 126) return null;
   return {
     char,
     decimal: code,
