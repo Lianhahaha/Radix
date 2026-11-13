@@ -303,7 +303,7 @@ select {
   flex-shrink: 0;
 }
 
-.copy-btn:hover { color: var(--accent); background: var(--accent-dim); }
+.copy-btn:hover { color: var(--accent); background: var(--bg-2); }
 .copy-btn.copied { color: var(--green); background: var(--green-dim); }
 
 /* ── Error message ───────────────────────────────────────────────── */
@@ -350,7 +350,7 @@ select {
 .bit-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 .bit-btn.active {
-  background: var(--accent-dim);
+  background: var(--bg-2);
   border-color: var(--accent);
   color: var(--text);
 }
@@ -538,7 +538,7 @@ select {
   margin-top: 8px;
 }
 
-.clear-history-btn:hover { color: var(--red); background: var(--red-dim); }
+.clear-history-btn:hover { color: var(--red); background: var(--bg-2); }
 
 /* ── ASCII Lookup ────────────────────────────────────────────────── */
 .ascii-section { }
@@ -635,7 +635,7 @@ select {
 .swap-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
-  background: var(--accent-dim);
+  background: var(--bg-2);
 }
 
 /* ── Active base indicator ───────────────────────────────────────── */
@@ -653,7 +653,7 @@ select {
   font-size: 0.72rem;
   font-weight: 500;
   color: var(--text);
-  background: var(--accent-dim);
+  background: var(--bg-1);
   border: 1px solid var(--accent);
   padding: 2px 8px;
   border-radius: 4px;
