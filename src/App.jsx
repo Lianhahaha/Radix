@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import BaseInput from './components/BaseInput';
 import StepPanel from './components/StepPanel';
 import BitWidthSelector from './components/BitWidthSelector';
@@ -7,6 +7,7 @@ import HistoryPanel from './components/HistoryPanel';
 import ExtrasContainer from './components/ExtrasContainer';
 import LearnPanel from './components/LearnPanel';
 import { convert } from './utils/convert';
+import { entryBaseId, parseHistory, addHistoryEntry } from './utils/history';
 
 // ── Icons ──────────────────────────────────────────────────────────
 const SunIcon = () => (
@@ -62,9 +63,24 @@ const BASES = [
 
 const HISTORY_KEY = 'radix-convert-history';
 const THEME_KEY   = 'radix-convert-theme';
+const HISTORY_LIMIT = 10;
 
 function loadHistory() {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch { return []; }
+  try {
+    return parseHistory(localStorage.getItem(HISTORY_KEY), HISTORY_LIMIT);
+  } catch {
+    return [];
+  }
+}
+
+function loadTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === 'dark' || saved === 'light') return saved;
+  } catch {
+    /* storage unavailable — fall through to system preference */
+  }
+  return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
 // ── Custom hook: detect mobile ─────────────────────────────────────
@@ -83,7 +99,7 @@ function useIsMobile() {
 export default function App() {
   const [values, setValues] = useState({ 2: '', 8: '', 10: '', 16: '', custom: '' });
   const [activeBase, setActiveBase] = useState(10);
-  const [customBase, setCustomBase] = useState(3);
+  const [customBase, setCustomBase] = useState('3');
   const [error, setError]     = useState('');
   const [bitWidth, setBitWidth] = useState(8);
   const [history, setHistory]  = useState(loadHistory);
@@ -91,17 +107,29 @@ export default function App() {
   const [mainTab, setMainTab] = useState('app'); // 'app' or 'learn'
   const [hasUserTyped, setHasUserTyped] = useState(false);
   const isMobile = useIsMobile();
+  const historyTimer = useRef(null);
 
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved) return saved;
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-  });
+  const [theme, setTheme] = useState(loadTheme);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(THEME_KEY, theme);
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      /* ignore quota / private-mode failures */
+    }
   }, [theme]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch {
+      /* ignore quota / private-mode failures */
+    }
+  }, [history]);
+
+  // Cancel any pending history write when the component unmounts.
+  useEffect(() => () => clearTimeout(historyTimer.current), []);
 
   // ── Core conversion ────────────────────────────────────────────
   const handleInput = useCallback((fromId, raw, overrideCustomBase) => {
@@ -109,6 +137,7 @@ export default function App() {
     setActiveBase(fromId);
 
     if (!input) {
+      clearTimeout(historyTimer.current);
       setValues({ 2: '', 8: '', 10: '', 16: '', custom: '' });
       setError('');
       setHasUserTyped(false);
@@ -131,7 +160,7 @@ export default function App() {
 
     const activeObj = currentExtendedBases.find(b => b.id === fromId);
     if (!activeObj || !activeObj.base) {
-      setError('Invalid base');
+      setError(fromId === 'custom' ? 'Custom base must be between 2 and 36' : 'Invalid base');
       setValues(newValues);
       return;
     }
@@ -154,37 +183,40 @@ export default function App() {
     if (!firstError) {
       const entry = {
         input,
+        fromId,
         fromBase: fromBaseNum,
+        customBase: fromId === 'custom' ? String(cbStr) : undefined,
         results: newValues,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-      setHistory(prev => {
-        const deduped = prev.filter(h => !(h.input === input && h.fromBase === fromBaseNum));
-        const next = [entry, ...deduped].slice(0, 10);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
-        return next;
-      });
+      // Debounce so a burst of keystrokes leaves one history entry, not ten.
+      clearTimeout(historyTimer.current);
+      historyTimer.current = setTimeout(() => {
+        setHistory(prev => addHistoryEntry(prev, entry, HISTORY_LIMIT));
+      }, 700);
     }
   }, [customBase]);
 
-  const handleCustomBaseChange = (newVal) => {
-    setCustomBase(newVal);
+  const handleCustomBaseChange = (raw) => {
+    const next = String(raw).replace(/\D/g, '').slice(0, 2);
+    setCustomBase(next);
     if (hasUserTyped && values[activeBase]) {
-      handleInput(activeBase, values[activeBase], newVal);
+      handleInput(activeBase, values[activeBase], next);
     }
   };
 
   const parsedCustom = parseInt(customBase, 10);
   const isValidCustom = !isNaN(parsedCustom) && parsedCustom >= 2 && parsedCustom <= 36;
-  const extendedBases = [
+  const extendedBases = useMemo(() => [
     ...BASES.map(b => ({ id: b.base, base: b.base, name: b.name })),
     { id: 'custom', base: isValidCustom ? parsedCustom : null, name: 'Custom', isCustom: true }
-  ];
+  ], [isValidCustom, parsedCustom]);
 
 
   const handleHistorySelect = (item) => {
     setValues(item.results);
-    setActiveBase(item.fromBase);
+    setActiveBase(entryBaseId(item));
+    if (entryBaseId(item) === 'custom' && item.customBase) setCustomBase(String(item.customBase));
     setError('');
     setHasUserTyped(true);
     if (isMobile) setMobileTab('convert');
@@ -200,7 +232,9 @@ export default function App() {
     <>
       <div className="active-base-row">
         <span>Input base:</span>
-        <span className="active-base-chip">base {activeBase === 'custom' ? (isValidCustom ? customBase : '?') : activeBase}</span>
+        <span className="active-base-chip">
+          base {activeBase === 'custom' ? (isValidCustom ? customBase : '?') : activeBase}
+        </span>
       </div>
 
       {error && <div className="error-msg">{error}</div>}
@@ -210,7 +244,7 @@ export default function App() {
           const isActive = activeBase === id;
           const hasResult = !!values[id] && !error;
           return (
-            <div key={id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div key={id} className="base-field-group">
               <BaseInput
                 base={base}
                 name={name}
@@ -270,9 +304,23 @@ export default function App() {
           <span className="header-tag">Comp Archi</span>
         </div>
         {!isMobile && (
-          <div className="header-tabs">
-            <button className={`header-tab ${mainTab === 'app' ? 'active' : ''}`} onClick={() => setMainTab('app')}>Converter</button>
-            <button className={`header-tab ${mainTab === 'learn' ? 'active' : ''}`} onClick={() => setMainTab('learn')}>Learn</button>
+          <div className="header-tabs" role="tablist" aria-label="Sections">
+            <button
+              className={`header-tab ${mainTab === 'app' ? 'active' : ''}`}
+              onClick={() => setMainTab('app')}
+              role="tab"
+              aria-selected={mainTab === 'app'}
+            >
+              Converter
+            </button>
+            <button
+              className={`header-tab ${mainTab === 'learn' ? 'active' : ''}`}
+              onClick={() => setMainTab('learn')}
+              role="tab"
+              aria-selected={mainTab === 'learn'}
+            >
+              Learn
+            </button>
           </div>
         )}
         <div className="header-actions">
@@ -290,30 +338,30 @@ export default function App() {
       {isMobile ? (
         /* ── Mobile: single-column tab-switched ────────────────── */
         <>
-          <main style={{ paddingBottom: 80 }}>
+          <main className="mobile-main">
             {mobileTab === 'convert' && (
-              <section className="left-pane fade-in" style={{ borderRight: 'none', minHeight: 'unset' }}>
+              <section className="mobile-pane fade-in">
                 {ConverterContent}
               </section>
             )}
             {mobileTab === 'history' && (
-              <section className="left-pane fade-in" style={{ borderRight: 'none', minHeight: 'unset' }}>
+              <section className="mobile-pane fade-in">
                 {HistoryContent}
               </section>
             )}
             {mobileTab === 'extras' && (
-              <section className="left-pane fade-in" style={{ borderRight: 'none', minHeight: 'unset' }}>
+              <section className="mobile-pane fade-in">
                 {ExtrasContent}
               </section>
             )}
             {mobileTab === 'learn' && (
-              <section className="left-pane fade-in" style={{ borderRight: 'none', minHeight: 'unset', padding: '0 16px' }}>
+              <section className="mobile-pane fade-in">
                 <LearnPanel />
               </section>
             )}
           </main>
 
-          <nav className="mobile-nav">
+          <nav className="mobile-nav" aria-label="Sections">
             {[
               { id: 'convert', label: 'Convert', icon: <ConvertIcon /> },
               { id: 'history', label: 'History', icon: <HistoryIcon /> },
@@ -324,6 +372,7 @@ export default function App() {
                 key={tab.id}
                 className={`mobile-nav-btn ${mobileTab === tab.id ? 'active' : ''}`}
                 onClick={() => setMobileTab(tab.id)}
+                aria-current={mobileTab === tab.id ? 'page' : undefined}
               >
                 {tab.icon}
                 {tab.label}

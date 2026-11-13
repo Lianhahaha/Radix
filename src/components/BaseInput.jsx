@@ -46,14 +46,14 @@ export default function BaseInput({ base, name, value, onChange, isActive, error
         {isCustom ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span className="base-badge">base</span>
-            <input 
-              type="number"
+            <input
+              type="text"
+              inputMode="numeric"
               className="custom-base-input"
+              aria-label="Custom base (2 to 36)"
               style={{ width: '40px', padding: '2px 4px', fontSize: '0.75rem', height: '24px', minHeight: 'unset', margin: 0 }}
               value={customBaseStr}
               onChange={e => onCustomBaseChange(e.target.value)}
-              min={2}
-              max={36}
             />
           </div>
         ) : (
@@ -72,6 +72,8 @@ export default function BaseInput({ base, name, value, onChange, isActive, error
         spellCheck={false}
         autoComplete="off"
         autoCapitalize="off"
+        autoCorrect="off"
+        aria-label={`${name} value`}
       />
       <button
         className={`copy-btn ${copied ? 'copied' : ''}`}

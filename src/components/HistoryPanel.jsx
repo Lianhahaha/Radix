@@ -1,3 +1,5 @@
+import { entryBaseId } from '../utils/history';
+
 const TrashIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <polyline points="3 6 5 6 21 6"/>
@@ -25,8 +27,10 @@ export default function HistoryPanel({ history, onSelect, onClear }) {
             <div>
               <div className="history-from">
                 {item.input}&nbsp;
-                <span style={{ color: 'var(--text-3)', fontSize: '0.7rem' }}>
-                  (base {item.fromBase})
+                <span className="history-base">
+                  {entryBaseId(item) === 'custom'
+                    ? `(base ${item.customBase ?? item.fromBase})`
+                    : `(base ${item.fromBase})`}
                 </span>
               </div>
               <div className="history-meta">

@@ -76,7 +76,6 @@ export function convert(input, fromBase, toBase, fracPrecision = 10) {
 
   // Fraction part: exact rational arithmetic, digit by digit.
   let fracDigits = '';
-  let remainder = 0n;
   if (fracPart) {
     const denominator = bigFrom ** BigInt(fracPart.length);
     let numerator = 0n;
