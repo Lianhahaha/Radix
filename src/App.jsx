@@ -238,7 +238,6 @@ export default function App() {
       </div>
 
       <BitWidthSelector
-        binValue={values[2]}
         decimalValue={values[10]}
         width={bitWidth}
         setWidth={setBitWidth}
