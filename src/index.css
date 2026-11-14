@@ -208,6 +208,7 @@ select {
   width: 100%;
   padding: 0;
   align-items: start;
+  scroll-margin-top: 64px;
 }
 
 .left-pane {
@@ -254,7 +255,7 @@ select {
 
 .base-row {
   display: grid;
-  grid-template-columns: 174px 1fr auto;
+  grid-template-columns: 174px 1fr auto auto;
   align-items: stretch;
   gap: 0;
   border: 1px solid var(--border);
@@ -341,6 +342,29 @@ select {
 
 .copy-btn:hover { color: var(--accent); background: var(--bg-2); }
 .copy-btn.copied { color: var(--green); background: var(--green-dim); }
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 100%;
+  color: var(--text-3);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--transition), color var(--transition), background var(--transition);
+}
+
+.base-row:hover .clear-btn,
+.base-row:focus-within .clear-btn {
+  opacity: 1;
+}
+
+.clear-btn:hover { color: var(--red); background: var(--bg-2); }
+
+@media (hover: none) {
+  .clear-btn { opacity: 1; }
+}
 
 /* ── Error message ───────────────────────────────────────────────── */
 .error-msg {
@@ -542,7 +566,7 @@ select {
 
 .step-heading {
   font-weight: 500;
-  color: var(--accent-hi);
+  color: var(--text);
   margin-top: 10px;
   margin-bottom: 4px;
   font-family: var(--sans);
@@ -762,7 +786,7 @@ select {
   }
 
   .base-row {
-    grid-template-columns: 168px 1fr auto;
+    grid-template-columns: 168px 1fr auto auto;
   }
 
   .base-label { padding: 8px 10px; }
@@ -850,6 +874,14 @@ select {
   margin: 6px 0 14px;
 }
 
+.app-footnote {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
 /* ── Animations ──────────────────────────────────────────────────── */
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-6px); }
@@ -892,7 +924,9 @@ select {
 .learn-section-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--accent-hi);
+  color: var(--text);
+  border-left: 3px solid var(--accent);
+  padding-left: 10px;
   margin-bottom: 12px;
   margin-top: 32px;
 }

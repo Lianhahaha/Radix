@@ -61,9 +61,33 @@ const BASES = [
   { base: 16, name: 'Hexadecimal' },
 ];
 
+const EMPTY_VALUES = { 2: '', 8: '', 10: '', 16: '', custom: '' };
+
 const HISTORY_KEY = 'radix-convert-history';
 const THEME_KEY   = 'radix-convert-theme';
+const BIT_WIDTH_KEY = 'radix-convert-bit-width';
+const CUSTOM_BASE_KEY = 'radix-convert-custom-base';
 const HISTORY_LIMIT = 10;
+const BIT_WIDTHS = [8, 16, 32, 64];
+
+function readPreference(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function loadBitWidth() {
+  const saved = Number(readPreference(BIT_WIDTH_KEY));
+  return BIT_WIDTHS.includes(saved) ? saved : 8;
+}
+
+function loadCustomBase() {
+  const saved = readPreference(CUSTOM_BASE_KEY);
+  const parsed = parseInt(saved, 10);
+  return Number.isInteger(parsed) && parsed >= 2 && parsed <= 36 ? String(parsed) : '3';
+}
 
 function loadHistory() {
   try {
@@ -97,12 +121,12 @@ function useIsMobile() {
 
 // ── App ────────────────────────────────────────────────────────────
 export default function App() {
-  const [values, setValues] = useState({ 2: '', 8: '', 10: '', 16: '', custom: '' });
+  const [values, setValues] = useState({ ...EMPTY_VALUES });
   const [activeBase, setActiveBase] = useState(10);
-  const [customBase, setCustomBase] = useState('3');
+  const [customBase, setCustomBase] = useState(loadCustomBase);
   const [error, setError]     = useState('');
   const [errorBase, setErrorBase] = useState(null);
-  const [bitWidth, setBitWidth] = useState(8);
+  const [bitWidth, setBitWidth] = useState(loadBitWidth);
   const [history, setHistory]  = useState(loadHistory);
   const [mobileTab, setMobileTab] = useState('convert');
   const [mainTab, setMainTab] = useState('app'); // 'app' or 'learn'
@@ -131,6 +155,22 @@ export default function App() {
     }
   }, [history]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(BIT_WIDTH_KEY, String(bitWidth));
+    } catch {
+      /* ignore quota / private-mode failures */
+    }
+  }, [bitWidth]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CUSTOM_BASE_KEY, String(customBase));
+    } catch {
+      /* ignore quota / private-mode failures */
+    }
+  }, [customBase]);
+
   // Cancel any pending history write when the component unmounts.
   useEffect(() => () => clearTimeout(historyTimer.current), []);
 
@@ -141,7 +181,17 @@ export default function App() {
 
     if (!input) {
       clearTimeout(historyTimer.current);
-      setValues({ 2: '', 8: '', 10: '', 16: '', custom: '' });
+      setValues({ ...EMPTY_VALUES });
+      setError('');
+      setErrorBase(null);
+      setHasUserTyped(false);
+      return;
+    }
+
+    // A lone sign or dot is an in-progress value, not a conversion.
+    if (!/[0-9a-z]/i.test(input)) {
+      clearTimeout(historyTimer.current);
+      setValues({ ...EMPTY_VALUES, [fromId]: input });
       setError('');
       setErrorBase(null);
       setHasUserTyped(false);
@@ -220,7 +270,7 @@ export default function App() {
 
 
   const handleHistorySelect = (item) => {
-    setValues(item.results);
+    setValues({ ...EMPTY_VALUES, ...item.results });
     const id = entryBaseId(item);
     setActiveBase(id);
     if (id === 'custom') {
@@ -263,7 +313,7 @@ export default function App() {
               <BaseInput
                 base={base}
                 name={name}
-                value={values[id]}
+                value={values[id] ?? ''}
                 onChange={val => handleInput(id, val)}
                 isActive={isActive}
                 error={!!error && errorBase === id}
@@ -299,6 +349,10 @@ export default function App() {
       />
 
       <Ieee754Viewer decimalValue={values[10]} />
+
+      <p className="app-footnote">
+        Everything runs locally in your browser — no numbers are uploaded anywhere.
+      </p>
     </>
   );
 
@@ -323,7 +377,7 @@ export default function App() {
       <header className="header">
         <div className="header-left">
           <span className="header-logo">radix<span>.</span>convert</span>
-          <span className="header-tag">Comp Archi</span>
+          <span className="header-tag">Bases 2–36</span>
         </div>
         {!isMobile && (
           <div className="header-tabs" role="tablist" aria-label="Sections">
