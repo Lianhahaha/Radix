@@ -59,6 +59,11 @@ describe('convert – fractions', () => {
     expect(convert('0.1', 10, 2, 20).result).toBe('0.00011001100110011001');
   });
 
+  it('uses upper-case digits in fractions too', () => {
+    expect(convert('0.7', 10, 16).result).toBe('0.B333333333');
+    expect(convert('0.7', 10, 16).result).toBe(convert('0.7', 10, 16).result.toUpperCase());
+  });
+
   it('handles degenerate dots without producing NaN', () => {
     expect(convert('3.', 10, 2)).toEqual({ result: '11', error: null });
     expect(convert('.5', 10, 2)).toEqual({ result: '0.1', error: null });

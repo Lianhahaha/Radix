@@ -85,7 +85,7 @@ export function convert(input, fromBase, toBase, fracPrecision = 10) {
     const precision = Math.max(0, Math.min(100, fracPrecision));
     for (let i = 0; i < precision && numerator > 0n; i++) {
       numerator *= bigTo;
-      fracDigits += (numerator / denominator).toString(toBase);
+      fracDigits += (numerator / denominator).toString(toBase).toUpperCase();
       numerator %= denominator;
     }
   }
