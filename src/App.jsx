@@ -327,7 +327,7 @@ export default function App() {
                     input={values[activeBase]}
                     fromBase={activeBase === 'custom' ? parseInt(customBase, 10) : activeBase}
                     toBase={base}
-                    label="Here's why"
+                    label="Show steps"
                   />
                 </div>
               )}

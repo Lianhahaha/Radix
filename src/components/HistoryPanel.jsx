@@ -13,7 +13,9 @@ export default function HistoryPanel({ history, onSelect, onClear }) {
     return (
       <div>
         <div className="section-label">History</div>
-        <div className="empty-state">No conversions yet.</div>
+        <div className="empty-state">
+          Nothing yet. Your last 10 conversions will appear here.
+        </div>
       </div>
     );
   }
