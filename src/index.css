@@ -994,35 +994,11 @@ select {
   color: var(--text-3);
 }
 
-/* ── String codec & proofs ───────────────────────────────────────── */
-.string-codec-section,
+/* ── Extras tools & proofs ───────────────────────────────────────── */
 .bitwise-section,
 .ascii-section {
   margin-top: 24px;
 }
-
-.codec-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.codec-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.codec-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-
-.codec-hex { color: var(--amber); font-size: 0.8rem; }
-.codec-bin { color: var(--green); font-size: 0.8rem; }
 
 .proof { margin-top: 24px; }
 
