@@ -4,7 +4,7 @@ import StepPanel from './components/StepPanel';
 import BitWidthSelector from './components/BitWidthSelector';
 import Ieee754Viewer from './components/Ieee754Viewer';
 import HistoryPanel from './components/HistoryPanel';
-import ExtrasContainer from './components/ExtrasContainer';
+import AsciiLookup from './components/AsciiLookup';
 import LearnPanel from './components/LearnPanel';
 import { convert } from './utils/convert';
 import { entryBaseId, parseHistory, addHistoryEntry } from './utils/history';
@@ -364,10 +364,8 @@ export default function App() {
     />
   );
 
-  const ExtrasContent = (
-    <>
-      <ExtrasContainer />
-    </>
+  const AsciiContent = (
+    <AsciiLookup />
   );
 
   // ── Render ──────────────────────────────────────────────────────
@@ -425,9 +423,9 @@ export default function App() {
                 {HistoryContent}
               </section>
             )}
-            {mobileTab === 'extras' && (
+            {mobileTab === 'ascii' && (
               <section className="mobile-pane fade-in">
-                {ExtrasContent}
+                {AsciiContent}
               </section>
             )}
             {mobileTab === 'learn' && (
@@ -441,7 +439,7 @@ export default function App() {
             {[
               { id: 'convert', label: 'Convert', icon: <ConvertIcon /> },
               { id: 'history', label: 'History', icon: <HistoryIcon /> },
-              { id: 'extras',  label: 'Extras',  icon: <AsciiIcon /> },
+              { id: 'ascii',   label: 'ASCII',   icon: <AsciiIcon /> },
               { id: 'learn',   label: 'Learn',   icon: <LearnIcon /> },
             ].map(tab => (
               <button
@@ -466,7 +464,7 @@ export default function App() {
             <aside className="right-pane">
               {HistoryContent}
               <hr className="divider" />
-              {ExtrasContent}
+              {AsciiContent}
             </aside>
           </main>
         ) : (

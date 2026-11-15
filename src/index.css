@@ -460,24 +460,7 @@ select {
   border-radius: 4px;
 }
 
-/* ── Bitwise calculator ──────────────────────────────────────────── */
-.bitwise-inputs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.bitwise-inputs .custom-base-input { flex: 1; min-width: 0; }
-.bitwise-op { flex: 0 0 auto; }
-
-.bitwise-widths {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.bitwise-widths .bit-btn { flex: 1; }
-
+/* ── Field feedback ──────────────────────────────────────────────── */
 .field-error {
   font-size: 0.75rem;
   color: var(--red);
@@ -491,7 +474,6 @@ select {
 }
 
 .binary-viewer-value.num { font-variant-numeric: tabular-nums; }
-.binary-viewer-value.accent { color: var(--accent-hi); }
 
 /* ── Custom Base ─────────────────────────────────────────────────── */
 .custom-base-section {
@@ -635,8 +617,6 @@ select {
 .clear-history-btn:hover { color: var(--red); background: var(--bg-2); }
 
 /* ── ASCII Lookup ────────────────────────────────────────────────── */
-.ascii-section { }
-
 .ascii-row {
   display: flex;
   gap: 8px;
@@ -862,7 +842,6 @@ select {
 .history-from,
 .history-meta,
 .ascii-table,
-.proof-value,
 .step-body {
   font-variant-numeric: tabular-nums;
 }
@@ -994,84 +973,10 @@ select {
   color: var(--text-3);
 }
 
-/* ── Extras tools & proofs ───────────────────────────────────────── */
-.bitwise-section,
+/* ── ASCII lookup ────────────────────────────────────────────────── */
 .ascii-section {
-  margin-top: 24px;
+  margin-top: 0;
 }
-
-.proof { margin-top: 24px; }
-
-.proof-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.proof-tabs::-webkit-scrollbar { display: none; }
-
-.proof-tab {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 8px 16px;
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  color: var(--text-3);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color var(--transition), border-color var(--transition);
-}
-
-.proof-tab:hover { color: var(--text); }
-.proof-tab.active { color: var(--text); border-bottom-color: var(--accent); }
-
-.proof-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: var(--bg-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 14px;
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  line-height: 1.7;
-}
-
-.proof-title {
-  font-family: var(--sans);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.proof-more {
-  color: var(--text-3);
-  font-size: 0.72rem;
-}
-
-.proof-row {
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
-.proof-row:last-child { border-bottom: none; padding-bottom: 0; }
-
-.proof-line {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.proof-muted { color: var(--text-3); }
-.proof-value { letter-spacing: 0.12em; word-break: break-all; text-align: right; }
-.proof-result { border-top: 1px solid var(--border); padding-top: 8px; color: var(--green); }
-.proof-amber { color: var(--amber); }
-.proof-green { color: var(--green); }
 
 /* ── Empty state ─────────────────────────────────────────────────── */
 .empty-state {
