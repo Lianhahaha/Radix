@@ -107,17 +107,6 @@ export function formatBinary(bin) {
 }
 
 /**
- * Pad a non-negative binary representation to a given bit width.
- * Returns null when the value is negative or does not fit.
- */
-export function padToBitWidth(binStr, width) {
-  const clean = String(binStr).replace(/\s/g, '').replace(/^-/, '');
-  if (String(binStr).trim().startsWith('-')) return null;
-  if (clean.length > width) return null;
-  return clean.padStart(width, '0');
-}
-
-/**
  * Two's complement of a decimal integer for a given bit width.
  * Returns a binary string (without spaces) or null if out of range.
  */
@@ -150,16 +139,4 @@ export function unsignedBits(decimal, width) {
   const value = BigInt(text);
   if (value < 0n || value >= 1n << BigInt(width)) return null;
   return value.toString(2).padStart(width, '0');
-}
-
-/**
- * Get all standard base representations at once.
- */
-export function convertAll(input, fromBase) {
-  const bases = { 2: '', 8: '', 10: '', 16: '' };
-  for (const toBase of Object.keys(bases)) {
-    const { result } = convert(input, fromBase, Number(toBase));
-    bases[toBase] = result;
-  }
-  return bases;
 }

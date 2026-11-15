@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { charToCode, codeToChar, isValidAsciiChar } from './ascii';
+import { charToCode, codeToChar } from './ascii';
 
 describe('ascii', () => {
   it('maps printable characters to their code points', () => {
@@ -27,12 +27,5 @@ describe('ascii', () => {
     expect(codeToChar(127)).toBeNull();
     expect(codeToChar(65.5)).toBeNull();
     expect(codeToChar('abc')).toBeNull();
-  });
-
-  it('validates single printable characters', () => {
-    expect(isValidAsciiChar('A')).toBe(true);
-    expect(isValidAsciiChar('AB')).toBe(false);
-    expect(isValidAsciiChar('')).toBe(false);
-    expect(isValidAsciiChar('é')).toBe(false);
   });
 });

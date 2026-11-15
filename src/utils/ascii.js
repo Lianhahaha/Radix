@@ -17,9 +17,3 @@ export function codeToChar(decimal) {
   if (!Number.isInteger(code) || code < 32 || code > 126) return null;
   return String.fromCharCode(code);
 }
-
-export function isValidAsciiChar(char) {
-  if (!char || char.length !== 1) return false;
-  const code = char.charCodeAt(0);
-  return code >= 32 && code <= 126;
-}

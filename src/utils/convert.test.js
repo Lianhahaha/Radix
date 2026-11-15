@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   convert,
-  convertAll,
   formatBinary,
-  padToBitWidth,
   twosComplement,
   unsignedBits,
 } from './convert';
@@ -107,17 +105,6 @@ describe('formatBinary', () => {
   });
 });
 
-describe('padToBitWidth', () => {
-  it('pads positive values', () => {
-    expect(padToBitWidth('101', 8)).toBe('00000101');
-  });
-
-  it('reports overflow and negatives', () => {
-    expect(padToBitWidth('100000000', 8)).toBeNull();
-    expect(padToBitWidth('-101', 8)).toBeNull();
-  });
-});
-
 describe('twosComplement', () => {
   it('encodes positive and negative values', () => {
     expect(twosComplement(5, 8)).toBe('00000101');
@@ -151,11 +138,5 @@ describe('unsignedBits', () => {
     expect(unsignedBits('-5', 8)).toBeNull();
     expect(unsignedBits('1.5', 8)).toBeNull();
     expect(unsignedBits('256', 8)).toBeNull();
-  });
-});
-
-describe('convertAll', () => {
-  it('returns every standard base', () => {
-    expect(convertAll('42', 10)).toEqual({ 2: '101010', 8: '52', 10: '42', 16: '2A' });
   });
 });
