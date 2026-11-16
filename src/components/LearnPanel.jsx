@@ -1,3 +1,21 @@
+const POWERS_OF_TWO = Array.from({ length: 11 }, (_, n) => ({ n, value: 2 ** n }));
+
+const NIBBLES = Array.from({ length: 16 }, (_, n) => ({
+  hex: n.toString(16).toUpperCase(),
+  binary: n.toString(2).padStart(4, '0'),
+  decimal: n,
+}));
+
+const WIDTHS = [8, 16, 32, 64].map((width) => {
+  const span = 1n << BigInt(width);
+  return {
+    width,
+    unsignedMax: (span - 1n).toLocaleString(),
+    signedMin: (-(span >> 1n)).toLocaleString().replace('-', '−'),
+    signedMax: ((span >> 1n) - 1n).toLocaleString(),
+  };
+});
+
 export default function LearnPanel() {
   return (
     <div className="learn-panel fade-in">
@@ -159,6 +177,63 @@ export default function LearnPanel() {
           <li><strong>Exponent:</strong> Where the decimal point goes (the power of 2).</li>
           <li><strong>Mantissa (Fraction):</strong> The actual precision digits of the number.</li>
         </ul>
+
+        <hr className="divider" style={{ margin: '32px 0' }} />
+
+        <h2 className="learn-section-title">6. Quick Reference</h2>
+
+        <h3 className="learn-subtitle">Powers of two</h3>
+        <p className="learn-text">
+          Each bit position is worth a power of two. Add the weights where the bit is 1.
+        </p>
+        <div className="ref-grid">
+          {POWERS_OF_TWO.map(({ n, value }) => (
+            <div className="ref-cell" key={n}>
+              <span>2<sup>{n}</sup></span>
+              <strong>{value.toLocaleString()}</strong>
+            </div>
+          ))}
+        </div>
+
+        <h3 className="learn-subtitle">One hex digit, four bits</h3>
+        <p className="learn-text">
+          Every hexadecimal digit maps to exactly four binary bits, which is why hex is
+          shorthand for binary.
+        </p>
+        <div className="ref-grid ref-grid-hex">
+          {NIBBLES.map(({ hex, binary, decimal }) => (
+            <div className="ref-cell" key={hex} title={`${decimal} decimal`}>
+              <span>{hex}</span>
+              <strong>{binary}</strong>
+            </div>
+          ))}
+        </div>
+
+        <h3 className="learn-subtitle">Register widths</h3>
+        <p className="learn-text">
+          An unsigned value uses every bit. A signed value gives up the top bit for the
+          sign, which halves the positive range.
+        </p>
+        <div className="ref-table-scroll">
+          <table className="ref-table">
+            <thead>
+              <tr>
+                <th>Width</th>
+                <th>Unsigned</th>
+                <th>Signed</th>
+              </tr>
+            </thead>
+            <tbody>
+              {WIDTHS.map(({ width, unsignedMax, signedMin, signedMax }) => (
+                <tr key={width}>
+                  <td>{width}-bit</td>
+                  <td>0 … {unsignedMax}</td>
+                  <td>{signedMin} … {signedMax}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
       </div>
     </div>
