@@ -23,6 +23,8 @@ optional walkthrough of the arithmetic behind each conversion.
 - **Quick reference** for powers of two, hex nibbles, register ranges and
   `0b` / `0o` / `0x` prefixes.
 - **History** of the last 10 conversions, stored locally, click to restore.
+- **Learn page** with worked examples for every base, common pitfalls and
+  in-page navigation.
 - Dark and light themes, keyboard accessible, works offline after the first load.
 
 ## Accuracy
