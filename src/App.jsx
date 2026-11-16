@@ -293,6 +293,14 @@ export default function App() {
   };
 
   // ── Sub-panels ─────────────────────────────────────────────────
+  const integerBitLength = (() => {
+    const decimal = (values[10] || '').trim();
+    if (!/^-?\d+$/.test(decimal)) return 0;
+    const value = BigInt(decimal);
+    const magnitude = value < 0n ? -value : value;
+    return magnitude === 0n ? 1 : magnitude.toString(2).length;
+  })();
+
   const ConverterContent = (
     <>
       <div className="active-base-row">
@@ -339,6 +347,20 @@ export default function App() {
       {!hasUserTyped && (
         <p className="hint">
           Type in any row to convert instantly — the other bases update as you go.
+        </p>
+      )}
+
+      {hasUserTyped && integerBitLength > 0 && (
+        <p className="value-facts">
+          <span><strong>{integerBitLength}</strong> bits</span>
+          <span>
+            <strong>{Math.ceil(integerBitLength / 8)}</strong>
+            {Math.ceil(integerBitLength / 8) === 1 ? ' byte' : ' bytes'}
+          </span>
+          <span>
+            <strong>{Math.ceil(integerBitLength / 4)}</strong>
+            {Math.ceil(integerBitLength / 4) === 1 ? ' hex digit' : ' hex digits'}
+          </span>
         </p>
       )}
 
