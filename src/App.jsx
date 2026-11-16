@@ -353,10 +353,12 @@ export default function App() {
       {hasUserTyped && integerBitLength > 0 && (
         <p className="value-facts">
           <span><strong>{integerBitLength}</strong> bits</span>
+          <span aria-hidden="true" className="fact-sep"> · </span>
           <span>
             <strong>{Math.ceil(integerBitLength / 8)}</strong>
             {Math.ceil(integerBitLength / 8) === 1 ? ' byte' : ' bytes'}
           </span>
+          <span aria-hidden="true" className="fact-sep"> · </span>
           <span>
             <strong>{Math.ceil(integerBitLength / 4)}</strong>
             {Math.ceil(integerBitLength / 4) === 1 ? ' hex digit' : ' hex digits'}

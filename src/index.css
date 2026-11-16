@@ -898,7 +898,7 @@ select {
 .value-facts {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 14px;
+  gap: 4px 0;
   font-size: 0.72rem;
   color: var(--text-3);
   margin: 6px 0 14px;
@@ -909,6 +909,8 @@ select {
   color: var(--text-2);
   font-weight: 500;
 }
+
+.value-facts .fact-sep { color: var(--border-hi); }
 
 .app-footnote {
   font-size: 0.7rem;
