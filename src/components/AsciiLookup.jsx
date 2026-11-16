@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { charToCode, codeToChar } from '../utils/ascii';
+import { charToCode, codeToChar, asciiCategory } from '../utils/ascii';
 
 export default function AsciiLookup() {
   const [charInput, setCharInput] = useState('');
@@ -50,6 +50,7 @@ export default function AsciiLookup() {
               <table className="ascii-table">
                 <tbody>
                   <tr><td>Decimal</td><td>{info.decimal}</td></tr>
+                  <tr><td>Type</td><td>{asciiCategory(info.decimal)}</td></tr>
                   <tr><td>Hex</td><td>{info.hex}</td></tr>
                   <tr><td>Binary</td><td>{info.binary.replace(/(.{4})/g, '$1 ').trim()}</td></tr>
                   <tr><td>Octal</td><td>{info.octal}</td></tr>

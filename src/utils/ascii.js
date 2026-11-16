@@ -17,3 +17,14 @@ export function codeToChar(decimal) {
   if (!Number.isInteger(code) || code < 32 || code > 126) return null;
   return String.fromCharCode(code);
 }
+
+/** Human-readable class for a printable ASCII code point. */
+export function asciiCategory(decimal) {
+  const code = Number(decimal);
+  if (!Number.isInteger(code) || code < 32 || code > 126) return null;
+  if (code === 32) return 'Space';
+  if (code >= 48 && code <= 57) return 'Digit';
+  if (code >= 65 && code <= 90) return 'Uppercase letter';
+  if (code >= 97 && code <= 122) return 'Lowercase letter';
+  return 'Punctuation / symbol';
+}
