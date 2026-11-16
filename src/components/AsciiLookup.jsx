@@ -66,6 +66,10 @@ export default function AsciiLookup() {
             : 'Code must be between 32 and 126.'}
         </div>
       ) : null}
+
+      <p className="ascii-ranges">
+        Printable 32–126 · digits 48–57 · A–Z 65–90 · a–z 97–122
+      </p>
     </div>
   );
 }

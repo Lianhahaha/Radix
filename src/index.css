@@ -696,6 +696,14 @@ select {
   font-size: 1.1rem;
 }
 
+.ascii-ranges {
+  font-size: 0.66rem;
+  color: var(--text-3);
+  line-height: 1.5;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
 .ascii-row .custom-base-input:not(.ascii-char-input) { flex: 1; min-width: 0; }
 .ascii-result-row { margin-bottom: 0; }
 .ascii-result-table { flex: 1; min-width: 0; }
