@@ -14,8 +14,14 @@ optional walkthrough of the arithmetic behind each conversion.
 - **Fractions** such as `3.14` and `101.101`, truncated to 10 fractional digits.
 - **Bit-width view** at 8, 16, 32, and 64 bits, including two's complement for
   negative values.
-- **IEEE 754** single- and double-precision breakdown of the decimal value.
-- **ASCII lookup** in both directions.
+- **Value facts** — bit length, byte size and hex-digit width for the current
+  number.
+- **IEEE 754** single- and double-precision breakdown, with the decoded exponent
+  and number class (normal, subnormal, zero, infinity, NaN).
+- **ASCII lookup** in both directions, plus the character class and printable
+  ranges.
+- **Quick reference** for powers of two, hex nibbles, register ranges and
+  `0b` / `0o` / `0x` prefixes.
 - **History** of the last 10 conversions, stored locally, click to restore.
 - Dark and light themes, keyboard accessible, works offline after the first load.
 
