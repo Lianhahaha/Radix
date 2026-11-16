@@ -125,7 +125,30 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">4. Fractional Conversions (The Dot)</h2>
+        <h2 className="learn-section-title">4. Octal (Base 8)</h2>
+        <p className="learn-text">
+          Octal uses eight digits, <code>0</code> through <code>7</code>. Each position is a
+          power of 8 (<code>1, 8, 64, 512…</code>), and each octal digit maps to exactly
+          three binary bits. It is less common than hex today, but it still shows up where
+          bits are grouped in threes, most visibly in Unix file permissions.
+        </p>
+        <div className="learn-example">
+          <div className="learn-example-title">Example: Convert 755 (Base 8) to Decimal</div>
+          <ul className="learn-list">
+            <li><code>5</code> × 8⁰ (1) = 5</li>
+            <li><code>5</code> × 8¹ (8) = 40</li>
+            <li><code>7</code> × 8² (64) = 448</li>
+            <li><strong>Total:</strong> 448 + 40 + 5 = <strong>493 (Base 10)</strong></li>
+          </ul>
+        </div>
+        <p className="learn-text">
+          That is why <code>chmod 755</code> means <em>rwxr-xr-x</em>: the three octal digits
+          are three permission bits each — read, write and execute.
+        </p>
+
+        <hr className="divider" style={{ margin: '32px 0' }} />
+
+        <h2 className="learn-section-title">5. Fractional Conversions (The Dot)</h2>
         <p className="learn-text">
           What happens after the decimal point? The powers simply become negative. In Base 10, positions after the dot are 10⁻¹ (0.1), 10⁻² (0.01). In Binary, positions after the dot are 2⁻¹ (0.5), 2⁻² (0.25), 2⁻³ (0.125).
         </p>
@@ -145,7 +168,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">5. Real-World Computer Contexts</h2>
+        <h2 className="learn-section-title">6. Real-World Computer Contexts</h2>
         
         <h3 className="learn-subtitle">Bit Widths (Hardware Limits)</h3>
         <p className="learn-text">
@@ -180,7 +203,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">6. Quick Reference</h2>
+        <h2 className="learn-section-title">7. Quick Reference</h2>
 
         <h3 className="learn-subtitle">Powers of two</h3>
         <p className="learn-text">
@@ -231,6 +254,30 @@ export default function LearnPanel() {
                   <td>{signedMin} … {signedMax}</td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className="learn-subtitle">Prefixes in source code</h3>
+        <p className="learn-text">
+          Most languages let you write the base inline. C and older JavaScript use a bare
+          leading zero for octal (<code>0755</code>), which is easy to misread — prefer{' '}
+          <code>0o</code> where it is supported.
+        </p>
+        <div className="ref-table-scroll">
+          <table className="ref-table">
+            <thead>
+              <tr>
+                <th>Prefix</th>
+                <th>Base</th>
+                <th>Example</th>
+                <th>Decimal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>0b</td><td>2</td><td>0b1010</td><td>10</td></tr>
+              <tr><td>0o</td><td>8</td><td>0o755</td><td>493</td></tr>
+              <tr><td>0x</td><td>16</td><td>0x2A</td><td>42</td></tr>
             </tbody>
           </table>
         </div>
