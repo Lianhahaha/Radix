@@ -965,6 +965,31 @@ select {
   padding-left: 10px;
   margin-bottom: 12px;
   margin-top: 32px;
+  scroll-margin-top: 72px;
+}
+
+.learn-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.learn-toc a {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-2);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.learn-toc a:hover {
+  color: var(--text);
+  border-color: var(--border-hi);
+  background: var(--bg-2);
 }
 
 .learn-subtitle {

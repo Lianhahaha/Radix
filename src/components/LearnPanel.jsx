@@ -16,6 +16,16 @@ const WIDTHS = [8, 16, 32, 64].map((width) => {
   };
 });
 
+const SECTIONS = [
+  { id: 'decimal', label: 'Decimal' },
+  { id: 'binary', label: 'Binary' },
+  { id: 'hexadecimal', label: 'Hex' },
+  { id: 'octal', label: 'Octal' },
+  { id: 'fractions', label: 'Fractions' },
+  { id: 'hardware', label: 'Hardware' },
+  { id: 'reference', label: 'Reference' },
+];
+
 export default function LearnPanel() {
   return (
     <div className="learn-panel fade-in">
@@ -25,9 +35,17 @@ export default function LearnPanel() {
           A numbering system, or <strong>radix</strong>, defines how many unique digits exist before you must carry over to a new column. In everyday life, we use Base 10 (Decimal). Computers, built on transistors that are either on or off, use Base 2 (Binary). To make binary easier for humans to read, programmers use Base 16 (Hexadecimal) and Base 8 (Octal).
         </p>
 
+        <nav className="learn-toc" aria-label="On this page">
+          {SECTIONS.map((section, i) => (
+            <a key={section.id} href={`#${section.id}`}>
+              {i + 1}. {section.label}
+            </a>
+          ))}
+        </nav>
+
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">1. The Anchor: Decimal (Base 10)</h2>
+        <h2 className="learn-section-title" id="decimal">1. The Anchor: Decimal (Base 10)</h2>
         <p className="learn-text">
           Before looking at computer systems, you have to understand how our everyday system works under the hood. Base 10 has ten digits: <code>0</code> through <code>9</code>. Every position in a number represents a power of the base, starting from zero on the right.
         </p>
@@ -47,7 +65,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">2. Binary (Base 2)</h2>
+        <h2 className="learn-section-title" id="binary">2. Binary (Base 2)</h2>
         <p className="learn-text">
           Binary has only two digits: <code>0</code> and <code>1</code>. Each position represents a power of 2 (1, 2, 4, 8, 16, 32, etc.).
         </p>
@@ -85,7 +103,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">3. Hexadecimal (Base 16)</h2>
+        <h2 className="learn-section-title" id="hexadecimal">3. Hexadecimal (Base 16)</h2>
         <p className="learn-text">
           Binary strings get dangerously long very quickly (e.g., a simple color code like white is <code>111111111111111111111111</code>). Hexadecimal compresses this.
         </p>
@@ -125,7 +143,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">4. Octal (Base 8)</h2>
+        <h2 className="learn-section-title" id="octal">4. Octal (Base 8)</h2>
         <p className="learn-text">
           Octal uses eight digits, <code>0</code> through <code>7</code>. Each position is a
           power of 8 (<code>1, 8, 64, 512…</code>), and each octal digit maps to exactly
@@ -148,7 +166,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">5. Fractional Conversions (The Dot)</h2>
+        <h2 className="learn-section-title" id="fractions">5. Fractional Conversions (The Dot)</h2>
         <p className="learn-text">
           What happens after the decimal point? The powers simply become negative. In Base 10, positions after the dot are 10⁻¹ (0.1), 10⁻² (0.01). In Binary, positions after the dot are 2⁻¹ (0.5), 2⁻² (0.25), 2⁻³ (0.125).
         </p>
@@ -168,7 +186,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">6. Real-World Computer Contexts</h2>
+        <h2 className="learn-section-title" id="hardware">6. Real-World Computer Contexts</h2>
         
         <h3 className="learn-subtitle">Bit Widths (Hardware Limits)</h3>
         <p className="learn-text">
@@ -203,7 +221,7 @@ export default function LearnPanel() {
 
         <hr className="divider" style={{ margin: '32px 0' }} />
 
-        <h2 className="learn-section-title">7. Quick Reference</h2>
+        <h2 className="learn-section-title" id="reference">7. Quick Reference</h2>
 
         <h3 className="learn-subtitle">Powers of two</h3>
         <p className="learn-text">
