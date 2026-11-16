@@ -1,36 +1,43 @@
 import { getIeee754 } from '../utils/ieee754';
 
+function describe(parts) {
+  const sign = parts.sign === '0' ? '+' : '−';
+  if (parts.classification === 'zero') return `${sign} zero`;
+  if (parts.classification === 'subnormal') return `${sign} subnormal · exponent 0`;
+  if (parts.classification === 'infinity') return `${sign} infinity · exponent at maximum`;
+  if (parts.classification === 'NaN') return 'not a number · exponent at maximum';
+  return `${sign} normal · exponent ${parts.exponentRaw} − ${parts.bias} = ${parts.exponentUnbiased}`;
+}
+
+function PrecisionBlock({ label, bits }) {
+  return (
+    <div className="binary-viewer fade-in">
+      <div className="binary-viewer-label">{label}</div>
+      <div className="ieee-bits">
+        <span className="ieee-sign" title="Sign bit">{bits.sign}</span>
+        <span className="ieee-exp" title="Exponent bits">{bits.exponent}</span>
+        <span className="ieee-mant" title="Mantissa bits">{bits.mantissa}</span>
+      </div>
+      <div className="ieee-meta">{describe(bits)}</div>
+    </div>
+  );
+}
+
 export default function Ieee754Viewer({ decimalValue }) {
   const ieee = getIeee754(decimalValue);
-
   if (!ieee) return null;
 
   return (
-    <div className="ieee-section" style={{ marginTop: '24px' }}>
+    <div className="ieee-section">
       <div className="section-label">IEEE 754 Floating Point</div>
-      
-      <div className="binary-viewer fade-in" style={{ marginBottom: '12px' }}>
-        <div className="binary-viewer-label" style={{ marginBottom: '8px' }}>Single Precision (32-bit)</div>
-        <div style={{ fontFamily: 'var(--mono)', fontSize: '0.82rem', wordBreak: 'break-all', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-          <span style={{ color: 'var(--accent-hi)' }} title="Sign bit (1 bit)">{ieee.single.sign}</span>
-          <span style={{ color: 'var(--amber)' }} title="Exponent (8 bits)">{ieee.single.exponent}</span>
-          <span style={{ color: 'var(--green)' }} title="Mantissa/Fraction (23 bits)">{ieee.single.mantissa}</span>
-        </div>
-      </div>
 
-      <div className="binary-viewer fade-in">
-        <div className="binary-viewer-label" style={{ marginBottom: '8px' }}>Double Precision (64-bit)</div>
-        <div style={{ fontFamily: 'var(--mono)', fontSize: '0.82rem', wordBreak: 'break-all', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-          <span style={{ color: 'var(--accent-hi)' }} title="Sign bit (1 bit)">{ieee.double.sign}</span>
-          <span style={{ color: 'var(--amber)' }} title="Exponent (11 bits)">{ieee.double.exponent}</span>
-          <span style={{ color: 'var(--green)' }} title="Mantissa/Fraction (52 bits)">{ieee.double.mantissa}</span>
-        </div>
-      </div>
+      <PrecisionBlock label="Single precision (32-bit)" bits={ieee.single} />
+      <PrecisionBlock label="Double precision (64-bit)" bits={ieee.double} />
 
-      <div style={{ fontSize: '0.65rem', color: 'var(--text-3)', display: 'flex', gap: '12px', marginTop: '8px' }}>
-        <span><span style={{ color: 'var(--accent-hi)' }}>■</span> Sign</span>
-        <span><span style={{ color: 'var(--amber)' }}>■</span> Exponent</span>
-        <span><span style={{ color: 'var(--green)' }}>■</span> Mantissa</span>
+      <div className="ieee-legend">
+        <span><span className="ieee-sign">■</span> Sign</span>
+        <span><span className="ieee-exp">■</span> Exponent</span>
+        <span><span className="ieee-mant">■</span> Mantissa</span>
       </div>
     </div>
   );

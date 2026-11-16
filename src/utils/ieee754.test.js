@@ -36,4 +36,27 @@ describe('getIeee754', () => {
     expect(ieee.single.sign + ieee.single.exponent + ieee.single.mantissa).toHaveLength(32);
     expect(ieee.double.sign + ieee.double.exponent + ieee.double.mantissa).toHaveLength(64);
   });
+
+  it('decodes the exponent and number class', () => {
+    const { single, double } = getIeee754('42');
+    expect(single.exponentRaw).toBe(132);
+    expect(single.exponentUnbiased).toBe(5);
+    expect(single.classification).toBe('normal');
+    expect(double.exponentRaw).toBe(1028);
+    expect(double.exponentUnbiased).toBe(5);
+    expect(double.classification).toBe('normal');
+  });
+
+  it('classifies zero, subnormal, infinity and NaN', () => {
+    expect(getIeee754('0').single.classification).toBe('zero');
+    expect(getIeee754('0').single.exponentUnbiased).toBeNull();
+
+    const tiny = getIeee754('1e-45').single; // smallest float32 subnormal
+    expect(tiny.classification).toBe('subnormal');
+    expect(tiny.exponentUnbiased).toBe(-126);
+
+    expect(getIeee754('Infinity').single.classification).toBe('infinity');
+    expect(getIeee754('1e400').single.classification).toBe('infinity'); // overflows 32-bit
+    expect(getIeee754('NaN')).toBeNull(); // the input itself is not a number
+  });
 });
