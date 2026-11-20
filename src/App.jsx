@@ -8,6 +8,7 @@ import AsciiLookup from './components/AsciiLookup';
 import LearnPanel from './components/LearnPanel';
 import { convert } from './utils/convert';
 import { entryBaseId, parseHistory, addHistoryEntry } from './utils/history';
+//aight
 
 // ── Icons ──────────────────────────────────────────────────────────
 const SunIcon = () => (
